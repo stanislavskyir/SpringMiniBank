@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user_service     # ????? ?? + ??? ????
+    username: postgres                             # ????????????
+    password: root                                 # ??????
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update                              # create | update | validate | none
+    show-sql: true                                  # ???????? SQL ? ????
+    properties:
+      hibernate:
+        format_sql: true
