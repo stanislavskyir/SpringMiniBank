@@ -16,4 +16,8 @@ public class User {
 
     private String firstName;
     private String lastName;
+
+    //Keycloak
+    private String keycloakId;
+
 }
