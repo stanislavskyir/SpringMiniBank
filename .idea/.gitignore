@@ -6,3 +6,17 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+# DB temp files and logs
+*.dblwr
+events_errors_*
+# IDE and system files
+*.log
+*.tmp
+*.swp
+.DS_Store
+# JetBrains (IntelliJ IDEA)
+.idea/
+*.iml
+# OS-specific
+Thumbs.db
