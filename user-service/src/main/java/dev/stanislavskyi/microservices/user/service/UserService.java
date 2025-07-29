@@ -2,26 +2,26 @@ package dev.stanislavskyi.microservices.user.service;
 
 import dev.stanislavskyi.microservices.user.dto.RegisterRequest;
 import dev.stanislavskyi.microservices.user.dto.UserPatchRequest;
-import dev.stanislavskyi.microservices.user.dto.UserResponse;
 import dev.stanislavskyi.microservices.user.dto.UserReplaceRequest;
+import dev.stanislavskyi.microservices.user.dto.UserResponse;
 import dev.stanislavskyi.microservices.user.exception.UserAlreadyExistsException;
 import dev.stanislavskyi.microservices.user.exception.UserNotFoundException;
 import dev.stanislavskyi.microservices.user.mapper.UserMapper;
 import dev.stanislavskyi.microservices.user.model.User;
 import dev.stanislavskyi.microservices.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 @Service
 @RequiredArgsConstructor
-
 public class UserService {
 
     private final UserRepository userRepository;
@@ -45,6 +45,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Page<UserResponse> findAll(Pageable pageable) {
+
+        log.debug("Fetching all users, page: {}, size: {}, sort: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        return userRepository.findAll(pageable).map(userMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
     public UserResponse findById(UUID id) {
         log.debug("Finding user by id: {}", id);
         return userRepository.findById(id)
@@ -55,8 +64,7 @@ public class UserService {
 
     @Transactional
     public UserResponse replaceUser(UUID id, UserReplaceRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = findUserOrThrow(id);
 
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -71,8 +79,7 @@ public class UserService {
 
     @Transactional
     public UserResponse patchUser(UUID id, UserPatchRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        User user = findUserOrThrow(id);
 
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
@@ -97,6 +104,11 @@ public class UserService {
         userRepository.deleteById(id);
         log.info("User deleted: id={}", id);
 
+    }
+
+    private User findUserOrThrow(UUID id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
 }

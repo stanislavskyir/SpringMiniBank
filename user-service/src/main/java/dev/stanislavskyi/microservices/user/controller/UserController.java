@@ -2,14 +2,18 @@ package dev.stanislavskyi.microservices.user.controller;
 
 import dev.stanislavskyi.microservices.user.dto.RegisterRequest;
 import dev.stanislavskyi.microservices.user.dto.UserPatchRequest;
-import dev.stanislavskyi.microservices.user.dto.UserResponse;
 import dev.stanislavskyi.microservices.user.dto.UserReplaceRequest;
+import dev.stanislavskyi.microservices.user.dto.UserResponse;
 import dev.stanislavskyi.microservices.user.service.UserService;
 import dev.stanislavskyi.microservices.user.utils.ApiPaths;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -44,6 +48,15 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
+
+    @GetMapping
+    @Operation(summary = "Get all users with pagination")
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+            @ParameterObject
+            @PageableDefault(page = 0, size = 20, sort = "lastName") Pageable pageable)
+    {
+        return ResponseEntity.ok(userService.findAll(pageable));
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID",

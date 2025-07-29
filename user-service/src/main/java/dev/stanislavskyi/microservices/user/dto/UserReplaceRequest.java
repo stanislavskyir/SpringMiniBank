@@ -10,7 +10,6 @@ public class UserReplaceRequest {
     @Size(max = 50)
     private String firstName;
 
-
     @NotBlank
     @Size(max = 50)
     private String lastName;
